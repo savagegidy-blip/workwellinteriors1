@@ -1,0 +1,13 @@
+# Never commit secrets. This project needs none: only the PUBLIC anon key is used in the pages.
+.env
+.env.*
+*.pem
+*.key
+service-role*
+# Editor / OS noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+node_modules/
+*.log

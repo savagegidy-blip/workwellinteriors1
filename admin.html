@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="color-scheme" content="light dark">
+<title>Workwell Admin</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231F3A2E'/%3E%3Ctext x='32' y='45' font-size='36' text-anchor='middle' fill='%23F1F5F2' font-family='Georgia,serif' font-weight='700'%3EW%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#E8ECEA;--surface:#F6F8F7;--ink:#14201A;--mute:#55635B;--green:#1F3A2E;--on-green:#F1F5F2;--line:#C9D1CC;--err:#A32E22;--ok:#1F6B45;--c-new:#C2410C;--c-confirmed:#1D4ED8;--c-paid:#15803D;--c-delivered:#1F3A2E;--c-cancelled:#6B7280}
+@media(prefers-color-scheme:dark){:root{--bg:#101814;--surface:#17221C;--ink:#E8EEEA;--mute:#98A8A0;--green:#2E5744;--on-green:#F1F5F2;--line:#2A3A32;--err:#E58A7E;--ok:#8FD0AE;--c-new:#FB923C;--c-confirmed:#7FA8FF;--c-paid:#4ADE80;--c-delivered:#8FD0AE;--c-cancelled:#9CA3AF}}
+*{box-sizing:border-box}html{scroll-padding-top:120px}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Familjen Grotesk",system-ui,sans-serif;padding-bottom:env(safe-area-inset-bottom,0px)}
+h1,h2,h3{margin:0;letter-spacing:-.02em}h2{font-size:26px}h3{font-size:18px}
+a{color:inherit}button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+.sr{position:absolute;left:-9999px}
+/* top bar */
+.bar{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top,0px)}
+.bar .wrap{display:flex;align-items:center;gap:16px;min-height:60px;flex-wrap:wrap;padding-top:6px;padding-bottom:6px}
+.brand{font-weight:700;font-size:19px;letter-spacing:-.02em;margin-right:auto}.brand small{font-weight:400;color:var(--mute);font-size:14px;margin-left:6px}
+.who{font-size:14px;color:var(--mute);display:flex;gap:12px;align-items:center}
+.tabs{display:flex;gap:4px;overflow-x:auto;width:100%;order:3;margin:0 -4px;padding-bottom:2px}
+.tab{background:none;border:0;padding:10px 14px;cursor:pointer;color:var(--mute);border-bottom:3px solid transparent;white-space:nowrap;font-size:15px}
+.tab[aria-selected=true]{color:var(--ink);border-bottom-color:var(--green);font-weight:500}
+.tab .n{background:var(--c-new);color:#fff;border-radius:20px;font-size:12px;padding:1px 8px;margin-left:6px}
+main{padding:24px 0 60px;min-height:70vh}
+/* buttons / inputs */
+.btn{display:inline-flex;align-items:center;gap:6px;background:var(--green);color:var(--on-green);border:0;border-radius:2px;padding:10px 18px;cursor:pointer;font-weight:500;text-decoration:none}
+.btn:disabled{opacity:.55;cursor:not-allowed}.btn.ghost{background:none;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--ink)}.btn.danger{background:none;color:var(--err);box-shadow:inset 0 0 0 1.5px var(--err)}.btn.sm{padding:6px 12px;font-size:14px}
+input,select,textarea{background:var(--surface);border:1px solid var(--line);border-radius:2px;padding:10px 12px;width:100%}
+input[type=checkbox]{width:auto}textarea{resize:vertical}
+label{display:grid;gap:6px;font-size:14px;color:var(--mute)}label.row{display:flex;align-items:center;gap:8px;color:var(--ink);font-size:15px}
+.err{color:var(--err);min-height:1.4em;margin:0;font-size:14px}.okm{color:var(--ok)}
+.muted{color:var(--mute)}small{color:var(--mute);font-size:13px}
+/* login */
+.login{max-width:400px;margin:12vh auto;padding:28px 24px;background:var(--surface);border-top:4px solid var(--green)}
+.login form{display:grid;gap:14px;margin-top:18px}.login p{color:var(--mute);margin:6px 0 0}
+.linkb{background:none;border:0;padding:0;text-decoration:underline;cursor:pointer;color:var(--ink)}
+/* cards / panels */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin:18px 0 26px}
+.stat{background:var(--surface);padding:16px 18px;border-left:4px solid var(--line)}.stat b{display:block;font-size:28px;letter-spacing:-.02em;line-height:1.1}.stat span{color:var(--mute);font-size:14px}.stat.hot{border-left-color:var(--c-new)}
+.grid2{display:grid;grid-template-columns:1.2fr 1fr;gap:20px}@media(max-width:860px){.grid2{grid-template-columns:1fr}}
+.panel{background:var(--surface);padding:18px 20px;margin-bottom:20px}.panel h3{margin-bottom:12px}
+.chart{display:flex;align-items:flex-end;gap:6px;height:150px;padding-top:8px}.chart div{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;font-size:12px;color:var(--mute)}
+.chart i{display:block;width:100%;background:var(--green);min-height:2px;border-radius:2px 2px 0 0}.chart em{font-style:normal;color:var(--ink);font-size:12px}
+.tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:16px 0}.tools input[type=search],.tools .grow{flex:1;min-width:200px}.tools select{width:auto}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+.chip{background:none;border:1px solid var(--line);border-radius:20px;padding:6px 14px;cursor:pointer;font-size:14px}.chip[aria-pressed=true]{background:var(--green);color:var(--on-green);border-color:var(--green)}.chip small{color:inherit;opacity:.8;margin-left:4px}
+.empty{padding:40px 10px;text-align:center;color:var(--mute)}
+/* badges */
+.bd{display:inline-flex;align-items:center;gap:6px;font-size:13px;border:1px solid var(--line);border-radius:20px;padding:2px 10px;background:var(--bg);white-space:nowrap}.bd:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--c-cancelled)}
+.bd.new:before{background:var(--c-new)}.bd.confirmed:before{background:var(--c-confirmed)}.bd.paid:before{background:var(--c-paid)}.bd.delivered:before{background:var(--c-delivered)}.bd.cancelled:before{background:var(--c-cancelled)}
+/* orders */
+.ord{background:var(--surface);margin-bottom:10px;border-left:4px solid var(--line)}.ord.new{border-left-color:var(--c-new)}
+.ord>button.sum{display:grid;grid-template-columns:90px 1.4fr 1fr 110px 110px;gap:12px;align-items:center;width:100%;text-align:left;background:none;border:0;padding:14px 16px;cursor:pointer}
+.ord .ref{font-weight:700;letter-spacing:.03em}.ord .tot{font-weight:700;text-align:right}
+@media(max-width:760px){.ord>button.sum{grid-template-columns:1fr auto;grid-auto-flow:row}.ord .tot{text-align:left}}
+.det{padding:4px 16px 16px;border-top:1px solid var(--line);display:grid;gap:12px}.det ul{list-style:none;margin:0;padding:0}.det li{display:flex;justify-content:space-between;gap:12px;padding:5px 0;border-bottom:1px solid var(--line)}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}.kv div{font-size:14px}.kv b{display:block;font-size:12px;color:var(--mute);font-weight:400;text-transform:uppercase;letter-spacing:.05em}
+.acts{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.acts select{width:auto}
+/* products */
+.prow{display:grid;grid-template-columns:64px 1fr 130px 92px 92px auto;gap:14px;align-items:center;background:var(--surface);padding:10px 14px;margin-bottom:8px;border-left:4px solid var(--line)}
+.crow{display:grid;grid-template-columns:1fr 100px 130px auto;gap:14px;align-items:center;background:var(--surface);padding:12px 14px;margin-bottom:8px;border-left:4px solid var(--line)}@media(max-width:700px){.crow{grid-template-columns:1fr auto}}
+img.th{display:block}
+.prow.off{opacity:.75}.prow .th{width:64px;height:64px;background:var(--bg);object-fit:cover;display:grid;place-items:center;font-size:11px;color:var(--mute);text-align:center}
+.prow .nm{font-weight:500;line-height:1.25}.prow small{display:block}
+.prow .pr{display:flex;align-items:center;gap:6px}.prow .pr input{padding:8px 10px}
+.sw{display:grid;gap:4px;justify-items:center;font-size:12px;color:var(--mute)}
+.sw button{width:46px;height:26px;border-radius:20px;border:0;background:var(--line);position:relative;cursor:pointer;padding:0}.sw button:after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .15s}.sw button[aria-checked=true]{background:var(--green)}.sw button[aria-checked=true]:after{left:23px}
+@media(max-width:860px){.prow{grid-template-columns:64px 1fr auto;grid-template-areas:"t n a" "p s v"}.prow>.th{grid-area:t}.prow>.nmw{grid-area:n}.prow>.pr{grid-area:p}.prow>.s1{grid-area:s}.prow>.s2{grid-area:v}.prow>.pa{grid-area:a}}
+/* modal */
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:50;display:flex;align-items:center;justify-content:center;padding:14px}.mo[hidden]{display:none}
+.md{background:var(--bg);width:100%;max-width:640px;max-height:94vh;display:flex;flex-direction:column}
+.mh{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--line)}.x{background:none;border:0;font-size:26px;cursor:pointer;line-height:1;padding:4px 8px}
+.mb{padding:18px 20px;overflow:auto;display:grid;gap:14px}.mf{display:flex;justify-content:flex-end;gap:10px;padding:14px 20px;border-top:1px solid var(--line)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:520px){.two{grid-template-columns:1fr}}
+.pg{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin:8px 0}
+.pi{position:relative;aspect-ratio:1/1;background:var(--surface);overflow:hidden}.pi img{width:100%;height:100%;object-fit:cover;display:block}
+.pi .pb{position:absolute;top:6px;left:6px;background:var(--ink);color:var(--bg);font-size:12px;padding:1px 8px;border-radius:20px}.pi .pend{position:absolute;bottom:34px;left:6px;background:var(--surface);color:var(--ink);font-size:11px;padding:1px 6px;border-radius:2px}
+.pi .pa{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-between;background:rgba(0,0,0,.62)}.pi .pa button{flex:1;background:none;border:0;color:#fff;padding:6px 0;cursor:pointer;font-size:14px}.pi .pa button:hover{background:rgba(255,255,255,.2)}
+.drop{display:grid;place-items:center;border:2px dashed var(--line);padding:22px;text-align:center;cursor:pointer;color:var(--ink)}.drop.over{border-color:var(--green);background:var(--surface)}
+.note{background:var(--surface);padding:10px 12px;font-size:14px;color:var(--mute);margin:0}
+/* toast */
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,30px);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:30px;opacity:0;pointer-events:none;transition:.25s;z-index:80;max-width:90vw;text-align:center}#toast.show{opacity:1;transform:translate(-50%,0)}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:sp .7s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
+pre{background:var(--surface);padding:12px;overflow:auto;font-size:13px;margin:8px 0}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="modal"></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<script>
+(function(){'use strict';
+/* ===== SETTINGS: your project URL and PUBLIC anon key (never the service_role / secret key) ===== */
+var CFG_URL='https://mcmebhsecuisiimxmwbe.supabase.co';
+var CFG_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1jbWViaHNlY3Vpc2lpbXhtd2JlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1NTU3NDksImV4cCI6MjEwODEzMTc0OX0.osiORmbCPP5pbbGnWfkupMcLv0P8JsJikhSMtxj6qmY';
+/* ================================================================================================ */
+var URL_=String(CFG_URL).replace(/\/+$/,''),KEY=String(CFG_KEY);
+var ON=/^https?:\/\//.test(URL_)&&URL_.indexOf('YOUR-')<0&&KEY.indexOf('YOUR-')<0&&KEY.length>20;
+if(ON){if(/^sb_secret_/.test(KEY))ON=false;try{var pl=KEY.split('.')[1];if(pl&&JSON.parse(atob(pl.replace(/-/g,'+').replace(/_/g,'/'))).role==='service_role')ON=false}catch(e){}}
+var STATUSES=['new','confirmed','paid','delivered','cancelled'],LBL={'new':'New',confirmed:'Confirmed',paid:'Paid',delivered:'Delivered',cancelled:'Cancelled'};
+var STORE_PHONE='0700357702',MAXIMG=12,BUCKET='product-images';
+var A={loadErr:null,forgot:false,S:null,admin:null,tab:'overview',products:[],orders:[],limitHit:false,loaded:{p:false,o:false},open:{},of:{status:'all',q:'',range:'all'},pf:{f:'all',q:''},seen:null,busy:{}};
+
+/* ---------- helpers ---------- */
+function $(s,r){return(r||document).querySelector(s)}function $$(s,r){return[].slice.call((r||document).querySelectorAll(s))}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function kes(n){return 'KES '+Number(n||0).toLocaleString('en-KE')}
+function ref(id){return String(id).slice(0,8).toUpperCase()}
+function fdate(iso){var d=new Date(iso);return isNaN(d)?'':d.toLocaleString('en-KE',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}
+function waNum(p){var d=String(p||'').replace(/\D/g,'');if(d.indexOf('254')===0)return d;if(d.charAt(0)==='0')return '254'+d.slice(1);if(d.length===9)return '254'+d;return d}
+var tt;function toast(m,bad){var e=$('#toast');e.textContent=m;e.style.background=bad?'var(--err)':'var(--ink)';e.style.color=bad?'#fff':'var(--bg)';e.classList.add('show');clearTimeout(tt);tt=setTimeout(function(){e.classList.remove('show')},bad?4200:2200)}
+function sleep(ms){return new Promise(function(r){setTimeout(r,ms)})}
+function pub(path){return URL_+'/storage/v1/object/public/'+BUCKET+'/'+path}
+function pathOf(u){var k='/object/public/'+BUCKET+'/',i=typeof u==='string'?u.indexOf(k):-1;return i<0?null:decodeURIComponent(u.slice(i+k.length))}
+function isOurs(u){return typeof u==='string'&&u.indexOf(URL_+'/storage/v1/object/public/')===0}
+
+/* ---------- API ---------- */
+function api(path,o){o=o||{};var h={apikey:KEY};if(o.token)h.Authorization='Bearer '+o.token;if(o.prefer)h.Prefer=o.prefer;
+ var body;if(o.blob){body=o.blob;h['Content-Type']=o.blob.type;if(o.cache)h['Cache-Control']=o.cache}else if(o.body!==undefined){body=JSON.stringify(o.body);h['Content-Type']='application/json'}
+ var ctl=window.AbortController?new AbortController():null,t=setTimeout(function(){if(ctl)ctl.abort()},o.timeout||15000);
+ return fetch(URL_+path,{method:o.method||'GET',headers:h,body:body,signal:ctl?ctl.signal:undefined}).then(function(r){clearTimeout(t);
+  return r.text().then(function(tx){var j=null;try{j=tx?JSON.parse(tx):null}catch(e){}
+   if(!r.ok){var er=new Error((j&&(j.msg||j.message||j.error_description||j.error))||('Error '+r.status));er.status=r.status;er.code=j&&j.code;throw er}return j})},
+  function(){clearTimeout(t);var er=new Error('Could not reach the server. Check your internet connection.');er.net=true;throw er})}
+function loadS(){try{var s=JSON.parse(localStorage.getItem('wwadmin')||'null');if(s&&s.access_token&&s.refresh_token&&s.user)A.S=s}catch(e){}}
+function saveS(){try{if(A.S)localStorage.setItem('wwadmin',JSON.stringify(A.S));else localStorage.removeItem('wwadmin')}catch(e){}}
+function setSession(j){A.S={access_token:j.access_token,refresh_token:j.refresh_token,expires_at:j.expires_at||(Math.floor(Date.now()/1000)+(j.expires_in||3600)),user:{id:j.user.id,email:j.user.email}};saveS()}
+function tok(){if(!A.S)return Promise.reject(new Error('Please sign in.'));
+ if(A.S.expires_at-Math.floor(Date.now()/1000)>60)return Promise.resolve(A.S.access_token);
+ return api('/auth/v1/token?grant_type=refresh_token',{method:'POST',body:{refresh_token:A.S.refresh_token}}).then(function(j){setSession(j);return A.S.access_token},function(e){if(!e.net){signOutLocal();render()}throw e})}
+function authed(path,o){o=o||{};return tok().then(function(t){o.token=t;return api(path,o)})}
+function signOutLocal(){A.S=null;A.admin=null;A.products=[];A.orders=[];A.loaded={p:false,o:false};A.seen=null;saveS();document.title='Workwell Admin'}
+
+/* ---------- data ---------- */
+function loadProducts(){return authed('/rest/v1/products?select=*&order=sort_order.asc,id.asc').then(function(r){A.products=r||[];A.loaded.p=true})}
+var OSEL='id,created_at,status,total_kes,customer_name,phone,delivery_location,mpesa_code,user_id,order_items(product_name,unit_price_kes,quantity)',OLIM=500;
+function loadOrders(silent){return authed('/rest/v1/orders?select='+OSEL+'&order=created_at.desc&limit='+OLIM).then(function(r){
+  r=r||[];var fresh=[];if(A.seen){r.forEach(function(o){if(!A.seen[o.id])fresh.push(o)})}
+  A.orders=r;A.limitHit=r.length>=OLIM;A.loaded.o=true;A.seen={};r.forEach(function(o){A.seen[o.id]=1});
+  var n=r.filter(function(o){return o.status==='new'}).length;document.title=(n?'('+n+') ':'')+'Workwell Admin';
+  if(silent&&fresh.length)toast(fresh.length===1?'New order from '+fresh[0].customer_name:fresh.length+' new orders');return fresh.length})}
+function checkAdmin(){return authed('/rest/v1/admins?select=user_id&user_id=eq.'+A.S.user.id).then(function(r){A.admin=!!(r&&r.length)})}
+function boot(){if(!A.S){render();return}A.admin=null;A.loadErr=null;render();
+ checkAdmin().then(function(){if(!A.admin){render();return}return Promise.all([loadProducts(),loadOrders()])}).then(function(){render()}).catch(function(e){if(A.S){A.loadErr=e.message||'Something went wrong.';render()}})}
+
+/* ---------- views ---------- */
+function render(){var app=$('#app');
+ if(!ON){app.innerHTML='<div class="login"><h2>Not set up yet</h2><p>Open <b>admin.html</b> in a text editor and paste your Supabase Project URL and public anon key near the top of the script. Never use the service_role key.</p></div>';return}
+ if(!A.S){app.innerHTML=A.forgot?forgotHtml():loginHtml();return}
+ if(A.admin===null){app.innerHTML=A.loadErr?'<div class="login"><h2>Could not load</h2><p class="err">'+esc(A.loadErr)+'</p><p><button class="btn" data-act="retry">Try again</button> <button class="btn ghost" data-act="logout">Sign out</button></p></div>':'<div class="login"><h2>Loading…</h2><p><span class="spin"></span></p></div>';return}
+ if(A.admin===false){app.innerHTML='<div class="login"><h2>No admin access</h2><p>You are signed in as <b>'+esc(A.S.user.email)+'</b>, but this account is not an admin of the store.</p><p><button class="btn ghost" data-act="logout">Sign out</button></p></div>';return}
+ var newN=A.orders.filter(function(o){return o.status==='new'}).length;
+ var tabs=[['overview','Overview'],['orders','Orders'],['customers','Customers'],['products','Products'],['settings','Settings']];
+ app.innerHTML='<div class="bar"><div class="wrap"><div class="brand">Workwell<small>Admin</small></div><div class="who"><a href="index.html" target="_blank" rel="noopener">View store</a><span>'+esc(A.S.user.email)+'</span><button class="btn ghost sm" data-act="logout">Sign out</button></div>'+
+  '<div class="tabs" role="tablist">'+tabs.map(function(t){return '<button class="tab" role="tab" data-act="tab" data-t="'+t[0]+'" aria-selected="'+(A.tab===t[0])+'">'+t[1]+(t[0]==='orders'&&newN?'<span class="n" aria-label="'+newN+' new">'+newN+'</span>':'')+'</button>'}).join('')+'</div></div></div><main><div class="wrap" id="view"></div></main>';
+ renderTab()}
+function renderTab(){var v=$('#view');if(!v)return;
+ if(A.tab==='overview')v.innerHTML=overviewHtml();else if(A.tab==='orders'){v.innerHTML=ordersShell();renderOrders()}
+ else if(A.tab==='customers'){v.innerHTML=customersHtml()}else if(A.tab==='products'){v.innerHTML=productsShell();renderProducts()}else v.innerHTML=settingsHtml()}
+function forgotHtml(){return '<div class="login"><h2>Reset password</h2><p>Enter your admin email and we send you a reset link.</p><form id="ff" novalidate><label>Email<input id="fe" type="email" autocomplete="username"></label><button class="btn" type="submit">Send reset link</button><p class="err" id="ferr" role="alert"></p></form><p><button class="linkb" data-act="unforgot">Back to sign in</button></p></div>'}
+function loginHtml(){return '<div class="login"><h2>Workwell Admin</h2><p>Sign in to manage orders, products and photos.</p><form id="lf" novalidate><label>Email<input id="le" type="email" autocomplete="username" required></label><label>Password<input id="lp" type="password" autocomplete="current-password" required></label><button class="btn" type="submit" id="lg">Sign in</button><p class="err" id="lerr" role="alert"></p></form><p><button class="linkb" data-act="forgot">Forgot password?</button></p></div>'}
+
+/* overview */
+function sumRev(list){return list.reduce(function(s,o){return s+(o.status==='paid'||o.status==='delivered'?o.total_kes:0)},0)}
+function overviewHtml(){var os=A.orders,now=new Date(),som=new Date(now.getFullYear(),now.getMonth(),1),w=new Date(now.getTime()-7*864e5);
+ var cnt=function(s){return os.filter(function(o){return o.status===s}).length};
+ var wk=os.filter(function(o){return new Date(o.created_at)>=w&&o.status!=='cancelled'}).length,mo=sumRev(os.filter(function(o){return new Date(o.created_at)>=som})),all=sumRev(os);
+ var live=A.products.filter(function(p){return p.is_active}).length,oos=A.products.filter(function(p){return p.is_active&&!p.in_stock}),hid=A.products.filter(function(p){return !p.is_active}).length;
+ var days=[];for(var i=13;i>=0;i--){var d=new Date(now.getFullYear(),now.getMonth(),now.getDate()-i);days.push({d:d,k:d.toDateString(),n:0})}
+ os.forEach(function(o){if(o.status==='cancelled')return;var k=new Date(o.created_at).toDateString();for(var j=0;j<days.length;j++)if(days[j].k===k){days[j].n++;break}});
+ var mx=Math.max(1,Math.max.apply(null,days.map(function(x){return x.n})));
+ var recent=os.slice(0,6).map(function(o){return '<div class="ord '+esc(o.status)+'" style="margin-bottom:8px"><button class="sum" data-act="goto-order" data-id="'+esc(o.id)+'" style="grid-template-columns:1fr auto"><span><b class="ref">'+ref(o.id)+'</b> · '+esc(o.customer_name)+'<br><small>'+fdate(o.created_at)+' · '+kes(o.total_kes)+'</small></span>'+badge(o.status)+'</button></div>'}).join('')||'<p class="empty">No orders yet. They appear here as soon as someone orders.</p>';
+ return '<h2>Overview</h2>'+(A.limitHit?'<p class="muted">Totals use your latest '+OLIM+' orders.</p>':'')+
+ '<div class="stats"><div class="stat'+(cnt('new')?' hot':'')+'"><b>'+cnt('new')+'</b><span>New orders to confirm</span></div><div class="stat"><b>'+(cnt('confirmed')+cnt('paid'))+'</b><span>Confirmed or paid, to deliver</span></div><div class="stat"><b>'+wk+'</b><span>Orders in the last 7 days</span></div><div class="stat"><b>'+kes(mo)+'</b><span>Paid this month</span></div><div class="stat"><b>'+kes(all)+'</b><span>Paid, all time</span></div><div class="stat"><b>'+live+'</b><span>Products on the store'+(oos.length?' · '+oos.length+' out of stock':'')+(hid?' · '+hid+' hidden':'')+'</span></div></div>'+
+ '<div class="grid2"><div class="panel"><h3>Orders per day (last 14 days)</h3><div class="chart" role="img" aria-label="Orders per day, last 14 days">'+days.map(function(x){return '<div title="'+x.d.toDateString()+': '+x.n+'"><em>'+(x.n||'')+'</em><i style="height:'+Math.round(x.n/mx*100)+'%"></i>'+x.d.getDate()+'</div>'}).join('')+'</div></div>'+
+ '<div class="panel"><h3>Latest orders</h3>'+recent+'<p><button class="linkb" data-act="tab" data-t="orders">See all orders</button></p></div></div>'+
+ (oos.length?'<div class="panel"><h3>Out of stock</h3><p>'+oos.map(function(p){return esc(p.name)}).join(', ')+'</p><p><button class="linkb" data-act="tab" data-t="products">Manage products</button></p></div>':'')}
+function badge(s){return '<span class="bd '+esc(s)+'">'+esc(LBL[s]||s)+'</span>'}
+
+/* orders */
+function ordersShell(){var cs=['all'].concat(STATUSES);
+ return '<h2>Orders</h2><div class="tools"><input type="search" id="oq" placeholder="Search name, phone, M-Pesa code or order number" aria-label="Search orders" value="'+esc(A.of.q)+'"><select id="or" aria-label="Date range"><option value="all">All time</option><option value="today">Today</option><option value="7">Last 7 days</option><option value="30">Last 30 days</option></select><button class="btn ghost sm" data-act="refresh-orders">Refresh</button><button class="btn ghost sm" data-act="export-orders">Export CSV</button></div><div class="chips" id="ochips" role="group" aria-label="Filter by status"></div><div id="olist"></div>'}
+function inRange(o){var r=A.of.range;if(r==='all')return true;var d=new Date(o.created_at),n=new Date();if(r==='today')return d.toDateString()===n.toDateString();return d>=new Date(n.getTime()-(+r)*864e5)}
+function matchO(o){var q=A.of.q.trim().toLowerCase();if(!q)return true;return(o.customer_name+' '+o.phone+' '+(o.mpesa_code||'')+' '+ref(o.id)+' '+(o.delivery_location||'')).toLowerCase().indexOf(q)>-1}
+function visOrders(){return A.orders.filter(function(o){return inRange(o)&&matchO(o)})}
+function renderOrders(){var base=visOrders(),list=base.filter(function(o){return A.of.status==='all'||o.status===A.of.status});
+ var sel=$('#or');if(sel)sel.value=A.of.range;
+ $('#ochips').innerHTML=['all'].concat(STATUSES).map(function(s){var n=s==='all'?base.length:base.filter(function(o){return o.status===s}).length;return '<button class="chip" data-act="ofilter" data-s="'+s+'" aria-pressed="'+(A.of.status===s)+'">'+(s==='all'?'All':LBL[s])+'<small>'+n+'</small></button>'}).join('');
+ $('#olist').innerHTML=list.length?list.map(orderHtml).join('')+(A.limitHit?'<p class="muted">Showing your latest '+OLIM+' orders.</p>':''):'<p class="empty">'+(A.orders.length?'No orders match these filters.':'No orders yet. When a customer orders on the store, it appears here.')+'</p>'}
+function nextStatus(s){return{'new':['confirmed','Confirm order'],confirmed:['paid','Mark as paid'],paid:['delivered','Mark as delivered']}[s]}
+function orderHtml(o){var open=!!A.open[o.id],items=(o.order_items||[]),n=nextStatus(o.status);
+ var d=!open?'':'<div class="det"><ul>'+items.map(function(i){return '<li><span>'+esc(i.quantity)+' × '+esc(i.product_name)+'</span><span>'+kes(i.unit_price_kes*i.quantity)+'</span></li>'}).join('')+'<li><b>Total</b><b>'+kes(o.total_kes)+'</b></li></ul>'+
+  '<div class="kv"><div><b>Customer</b>'+esc(o.customer_name)+'</div><div><b>Phone</b>'+esc(o.phone)+'</div><div><b>Delivery</b>'+esc(o.delivery_location||'Not given')+'</div><div><b>M-Pesa code</b>'+esc(o.mpesa_code||'Not given yet')+'</div><div><b>Account</b>'+(o.user_id?'Signed-in client':'Guest')+'</div><div><b>Placed</b>'+esc(new Date(o.created_at).toLocaleString('en-KE'))+'</div></div>'+
+  '<div class="acts">'+(n?'<button class="btn sm" data-act="status" data-id="'+esc(o.id)+'" data-s="'+n[0]+'">'+n[1]+'</button>':'')+'<label class="row" style="color:var(--mute)">Status <select data-act="status-sel" data-id="'+esc(o.id)+'" aria-label="Order status">'+STATUSES.map(function(s){return '<option value="'+s+'"'+(s===o.status?' selected':'')+'>'+LBL[s]+'</option>'}).join('')+'</select></label>'+
+  '<a class="btn ghost sm" target="_blank" rel="noopener" href="'+esc(waLink(o))+'">WhatsApp customer</a><a class="btn ghost sm" href="tel:+'+esc(waNum(o.phone))+'">Call</a><button class="btn danger sm" data-act="del-order" data-id="'+esc(o.id)+'">Delete</button></div></div>';
+ return '<div class="ord '+esc(o.status)+'" id="o-'+esc(o.id)+'"><button class="sum" data-act="toggle-order" data-id="'+esc(o.id)+'" aria-expanded="'+open+'"><span class="ref">'+ref(o.id)+'</span><span><b>'+esc(o.customer_name)+'</b><br><small>'+esc(o.phone)+'</small></span><span>'+fdate(o.created_at)+'<br><small>'+items.reduce(function(s,i){return s+i.quantity},0)+' item(s)</small></span><span class="tot">'+kes(o.total_kes)+'</span>'+badge(o.status)+'</button>'+d+'</div>'}
+function waLink(o){var r=ref(o.id),n=o.customer_name,m={'new':'Hello '+n+', thank you for your order '+r+' from Workwell Interiors ('+kes(o.total_kes)+'). We are confirming it now.',
+  confirmed:'Hello '+n+', your order '+r+' is confirmed. Please pay '+kes(o.total_kes)+' by M-Pesa to '+STORE_PHONE+' and send us the confirmation code.',
+  paid:'Hello '+n+', we have received your payment for order '+r+'. We will arrange delivery'+(o.delivery_location?' to '+o.delivery_location:'')+' shortly.',
+  delivered:'Hello '+n+', your order '+r+' has been delivered. Thank you for shopping with Workwell Interiors!',
+  cancelled:'Hello '+n+', your order '+r+' has been cancelled. Please contact us if you have any questions.'}[o.status];
+ return 'https://wa.me/'+waNum(o.phone)+'?text='+encodeURIComponent(m)}
+function setStatus(id,s){var o=A.orders.find(function(x){return x.id===id});if(!o||o.status===s)return;var old=o.status;o.status=s;renderOrders();refreshBadge();
+ authed('/rest/v1/orders?id=eq.'+encodeURIComponent(id),{method:'PATCH',body:{status:s},prefer:'return=representation'}).then(function(r){if(!r||!r.length)throw new Error('Not allowed. Is this account an admin?');toast('Order '+ref(id)+' is now '+LBL[s])}).catch(function(e){o.status=old;renderOrders();refreshBadge();toast('Could not update: '+e.message,true)})}
+function refreshBadge(){var newN=A.orders.filter(function(o){return o.status==='new'}).length,t=$('.tab[data-t="orders"]');if(t)t.innerHTML='Orders'+(newN?'<span class="n">'+newN+'</span>':'');document.title=(newN?'('+newN+') ':'')+'Workwell Admin'}
+
+/* customers */
+function customersHtml(){var m={};A.orders.forEach(function(o){if(o.status==='cancelled')return;var k=waNum(o.phone);var c=m[k]||(m[k]={name:o.customer_name,phone:o.phone,n:0,spent:0,last:o.created_at,loc:o.delivery_location});c.n++;if(o.status==='paid'||o.status==='delivered')c.spent+=o.total_kes;if(o.created_at>c.last){c.last=o.created_at;c.name=o.customer_name;if(o.delivery_location)c.loc=o.delivery_location}});
+ var rows=Object.keys(m).map(function(k){return m[k]}).sort(function(a,b){return a.last<b.last?1:-1});
+ return '<h2>Customers</h2><p class="muted">Built from your orders and grouped by phone number.</p><div class="tools"><button class="btn ghost sm" data-act="export-customers">Export CSV</button></div>'+(rows.length?rows.map(function(c){return '<div class="crow"><div class="nmw"><div class="nm">'+esc(c.name)+'</div><small>'+esc(c.phone)+(c.loc?' · '+esc(c.loc):'')+'</small></div><div><b>'+c.n+'</b><br><small>order(s)</small></div><div><b>'+kes(c.spent)+'</b><br><small>paid</small></div><div class="pa"><a class="btn ghost sm" target="_blank" rel="noopener" href="https://wa.me/'+esc(waNum(c.phone))+'">WhatsApp</a></div></div>'}).join(''):'<p class="empty">No customers yet.</p>')}
+
+/* products */
+function productsShell(){return '<h2>Products</h2><div class="tools"><input type="search" id="pq" placeholder="Search products" aria-label="Search products" value="'+esc(A.pf.q)+'"><button class="btn" data-act="add-product">+ Add product</button><button class="btn ghost sm" data-act="export-products">Export CSV</button></div><div class="chips" id="pchips" role="group" aria-label="Filter products"></div><div id="plist"></div>'}
+function matchP(p){var q=A.pf.q.trim().toLowerCase();return !q||(p.name+' '+p.category+' '+(p.description||'')).toLowerCase().indexOf(q)>-1}
+function renderProducts(){var base=A.products.filter(matchP);var F={all:function(){return true},instock:function(p){return p.is_active&&p.in_stock},oos:function(p){return p.is_active&&!p.in_stock},hidden:function(p){return !p.is_active}};
+ var L={all:'All',instock:'In stock',oos:'Out of stock',hidden:'Hidden'};
+ $('#pchips').innerHTML=Object.keys(F).map(function(k){return '<button class="chip" data-act="pfilter" data-f="'+k+'" aria-pressed="'+(A.pf.f===k)+'">'+L[k]+'<small>'+base.filter(F[k]).length+'</small></button>'}).join('');
+ var list=base.filter(F[A.pf.f]);
+ $('#plist').innerHTML=list.length?list.map(prodRow).join(''):'<p class="empty">'+(A.products.length?'No products match.':'No products yet. Click "Add product".')+'</p>'}
+function prodRow(p){var img=(p.images||[]).filter(isOurs)[0],th=img?'<img class="th" src="'+esc(img)+'" alt="">':'<div class="th">'+(p.legacy_name?'Site photo':'No photo')+'</div>';
+ return '<div class="prow'+(p.is_active?'':' off')+'" id="p-'+p.id+'">'+th+'<div class="nmw"><div class="nm">'+esc(p.name)+'</div><small>'+esc(p.category)+' · '+((p.images||[]).length||(p.legacy_name?'original':'0'))+' photo(s)'+(p.is_active?'':' · hidden')+'</small></div>'+
+  '<div class="pr"><input type="number" min="1" step="1" inputmode="numeric" value="'+esc(p.price_kes)+'" data-act="price" data-id="'+p.id+'" aria-label="Price of '+esc(p.name)+' in KES"></div>'+
+  '<div class="sw s1"><button role="switch" aria-checked="'+p.in_stock+'" data-act="stock" data-id="'+p.id+'" aria-label="In stock: '+esc(p.name)+'"></button>In stock</div>'+
+  '<div class="sw s2"><button role="switch" aria-checked="'+p.is_active+'" data-act="visible" data-id="'+p.id+'" aria-label="Visible on store: '+esc(p.name)+'"></button>Visible</div>'+
+  '<div class="pa acts"><button class="btn ghost sm" data-act="edit-product" data-id="'+p.id+'">Edit</button><button class="btn danger sm" data-act="del-product" data-id="'+p.id+'" aria-label="Delete '+esc(p.name)+'">Delete</button></div></div>'}
+function patchProduct(id,body,okMsg){var p=A.products.find(function(x){return x.id===id});if(!p)return Promise.resolve();var old={};Object.keys(body).forEach(function(k){old[k]=p[k]});Object.assign(p,body);
+ return authed('/rest/v1/products?id=eq.'+id,{method:'PATCH',body:body,prefer:'return=representation'}).then(function(r){if(!r||!r.length)throw new Error('Not allowed. Is this account an admin?');if(okMsg)toast(okMsg);return r[0]}).catch(function(e){Object.assign(p,old);toast('Could not save: '+(e.code==='23505'?'a product with that name already exists':e.message),true);renderProducts();throw e})}
+
+/* settings */
+function settingsHtml(){var sql="insert into public.admins (user_id)\nselect id from auth.users where email = 'NEW-ADMIN-EMAIL'\non conflict do nothing;";
+ return '<h2>Settings</h2><div class="grid2"><div class="panel"><h3>Change your password</h3><form id="pwf" novalidate style="display:grid;gap:12px;max-width:380px"><label>New password<input id="np" type="password" autocomplete="new-password" minlength="8"></label><label>Repeat new password<input id="np2" type="password" autocomplete="new-password"></label><button class="btn" type="submit">Update password</button><p class="err" id="pwe" role="alert"></p></form></div>'+
+ '<div class="panel"><h3>Your account</h3><p>Signed in as <b>'+esc(A.S.user.email)+'</b>.</p><p><a href="index.html" target="_blank" rel="noopener">Open the store</a></p><button class="btn ghost" data-act="logout">Sign out</button></div></div>'+
+ '<div class="panel"><h3>Adding another admin later</h3><p class="muted">Admins can only be added in Supabase, which keeps the dashboard safe. Create the person under Authentication &gt; Users, then run this in the SQL Editor:</p><pre>'+esc(sql)+'</pre></div>'}
+
+/* ---------- modals ---------- */
+function closeModal(){$('#modal').innerHTML='';document.body.style.overflow=''}
+function confirmBox(title,msg,okText,danger){return new Promise(function(res){var m=$('#modal');m.innerHTML='<div class="mo" role="alertdialog" aria-modal="true" aria-labelledby="ct"><div class="md" style="max-width:440px"><div class="mh"><h3 id="ct">'+esc(title)+'</h3></div><div class="mb"><p style="margin:0">'+esc(msg)+'</p></div><div class="mf"><button class="btn ghost" id="cn">Cancel</button><button class="btn'+(danger?' danger':'')+'" id="cy">'+esc(okText)+'</button></div></div></div>';
+  var done=function(v){m.innerHTML='';document.removeEventListener('keydown',kd);res(v)},kd=function(e){if(e.key==='Escape')done(false)};document.addEventListener('keydown',kd);$('#cn').onclick=function(){done(false)};$('#cy').onclick=function(){done(true)};$('#cn').focus()})}
+
+var M=null; // product editor state
+function openEditor(id){var p=id?A.products.find(function(x){return x.id===id}):null;
+ var cats=[];A.products.forEach(function(x){if(x.category&&cats.indexOf(x.category)<0)cats.push(x.category)});
+ var maxSort=A.products.reduce(function(s,x){return Math.max(s,x.sort_order||0)},0);
+ M={id:p?p.id:null,builtin:!!(p&&p.legacy_name),imgs:(p?(p.images||[]):[]).map(function(u){return{url:u}}),removed:[],saving:false,orig:p?(p.images||[]).slice():[]};
+ $('#modal').innerHTML='<div class="mo" id="pe"><div class="md" role="dialog" aria-modal="true" aria-labelledby="pet"><div class="mh"><h3 id="pet">'+(p?'Edit product':'Add product')+'</h3><button class="x" data-act="pe-close" aria-label="Close">&times;</button></div><div class="mb">'+
+ '<label>Name<input id="pn" maxlength="120" value="'+esc(p?p.name:'')+'"></label>'+
+ '<div class="two"><label>Category<input id="pc" list="cats" maxlength="40" value="'+esc(p?p.category:'')+'" placeholder="e.g. Chairs"><datalist id="cats">'+cats.map(function(c){return '<option value="'+esc(c)+'">'}).join('')+'</datalist></label><label>Price (KES)<input id="pp" type="number" min="1" step="1" inputmode="numeric" value="'+esc(p?p.price_kes:'')+'"></label></div>'+
+ '<label>Description<textarea id="pd" rows="3" maxlength="600">'+esc(p?p.description||'':'')+'</textarea></label>'+
+ '<div class="two"><label>Display order<input id="po" type="number" step="1" value="'+esc(p?p.sort_order:maxSort+1)+'"><small>Smaller numbers appear first.</small></label><div style="display:grid;gap:8px;align-content:center"><label class="row"><input type="checkbox" id="ps"'+(!p||p.in_stock?' checked':'')+'> In stock</label><label class="row"><input type="checkbox" id="pv"'+(!p||p.is_active?' checked':'')+'> Visible on the store</label></div></div>'+
+ '<div><b>Photos</b> <small>The first photo is the main one. Up to '+MAXIMG+'. Photos are shrunk automatically.</small>'+(M.builtin?'<p class="note" id="pnote"></p>':'')+'<div class="pg" id="pg"></div><label class="drop" id="pz" tabindex="0"><span>Drop photos here or <u>choose files</u></span><input type="file" id="pfile" accept="image/jpeg,image/png,image/webp" multiple hidden></label></div>'+
+ '<p class="err" id="pee" role="alert"></p></div><div class="mf"><button class="btn ghost" data-act="pe-close">Cancel</button><button class="btn" id="pesave" data-act="pe-save">Save product</button></div></div></div>';
+ document.body.style.overflow='hidden';paintImgs();var z=$('#pz'),f=$('#pfile');
+ z.onclick=function(e){if(e.target!==f)f.click()};z.onkeydown=function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();f.click()}};f.onclick=function(e){e.stopPropagation()};
+ f.onchange=function(){addFiles(f.files);f.value=''};['dragenter','dragover'].forEach(function(ev){z.addEventListener(ev,function(e){e.preventDefault();z.classList.add('over')})});['dragleave','drop'].forEach(function(ev){z.addEventListener(ev,function(e){e.preventDefault();z.classList.remove('over')})});z.addEventListener('drop',function(e){addFiles(e.dataTransfer.files)});
+ $('#pn').focus()}
+function paintImgs(){var g=$('#pg');if(!g)return;
+ g.innerHTML=M.imgs.map(function(im,i){var src=im.url||im.preview;return '<div class="pi"><img src="'+esc(src)+'" alt="Photo '+(i+1)+'">'+(i===0?'<span class="pb">Main</span>':'')+(im.file?'<span class="pend">New</span>':'')+'<div class="pa"><button type="button" data-act="img-left" data-i="'+i+'" aria-label="Move earlier"'+(i===0?' disabled':'')+'>&#9664;</button><button type="button" data-act="img-main" data-i="'+i+'" aria-label="Make main photo"'+(i===0?' disabled':'')+'>&#9733;</button><button type="button" data-act="img-right" data-i="'+i+'" aria-label="Move later"'+(i===M.imgs.length-1?' disabled':'')+'>&#9654;</button><button type="button" data-act="img-del" data-i="'+i+'" aria-label="Remove photo">&#10005;</button></div></div>'}).join('');
+ var n=$('#pnote');if(n)n.textContent=M.imgs.length?'These photos replace the original website photo on the store.':'This product currently shows its original website photo. Add photos here to replace it; remove all photos to go back to the original.';
+ var z=$('#pz');if(z)z.style.display=M.imgs.length>=MAXIMG?'none':''}
+function addFiles(fl){var arr=[].slice.call(fl||[]),bad=0;arr.forEach(function(f){if(M.imgs.length>=MAXIMG){bad++;return}
+  if(!/^image\/(jpeg|png|webp)$/.test(f.type)&&!/\.(jpe?g|png|webp)$/i.test(f.name)){bad++;return}
+  M.imgs.push({file:f,preview:URL.createObjectURL(f)})});paintImgs();if(bad)$('#pee').textContent=bad+' file(s) skipped: use JPG, PNG or WebP, and up to '+MAXIMG+' photos.'}
+function bitmapOf(file){if(window.createImageBitmap)return createImageBitmap(file).catch(function(){return viaImg(file)});return viaImg(file)}
+function viaImg(file){return new Promise(function(res,rej){var u=URL.createObjectURL(file),i=new Image();i.onload=function(){URL.revokeObjectURL(u);res(i)};i.onerror=function(){URL.revokeObjectURL(u);rej(new Error('That file is not a readable photo.'))};i.src=u})}
+function shrink(file){return bitmapOf(file).then(function(b){var w=b.width||b.naturalWidth,h=b.height||b.naturalHeight,s=Math.min(1,1600/Math.max(w,h));w=Math.max(1,Math.round(w*s));h=Math.max(1,Math.round(h*s));
+  var cv=document.createElement('canvas');cv.width=w;cv.height=h;var g=cv.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,w,h);g.drawImage(b,0,0,w,h);
+  return new Promise(function(res,rej){cv.toBlob(function(bl){if(!bl)return rej(new Error('Could not process that photo.'));if(bl.size>5242880)return rej(new Error('That photo is too large.'));res(bl)},'image/jpeg',.85)})})}
+function uploadOne(pid,file){return shrink(file).then(function(blob){var path='p'+pid+'/'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8)+'.jpg';
+  return authed('/storage/v1/object/'+BUCKET+'/'+path,{method:'POST',blob:blob,cache:'max-age=31536000',timeout:60000}).then(function(){return pub(path)})})}
+function removeFiles(urls){return Promise.all(urls.map(function(u){var p=pathOf(u);if(!p||!isOurs(u))return null;return authed('/storage/v1/object/'+BUCKET+'/'+p,{method:'DELETE'}).catch(function(){})}))}
+function saveProduct(){if(M.saving)return;var err=$('#pee'),name=$('#pn').value.trim(),cat=$('#pc').value.trim(),price=Math.round(+$('#pp').value),desc=$('#pd').value.trim(),so=Math.round(+$('#po').value||0);
+ err.textContent='';if(name.length<2)return err.textContent='Enter a product name.';if(!cat)return err.textContent='Enter a category.';if(!(price>=1))return err.textContent='Enter a price of at least KES 1.';
+ var fields={name:name,category:cat,price_kes:price,description:desc||null,sort_order:so,in_stock:$('#ps').checked,is_active:$('#pv').checked};
+ M.saving=true;var btn=$('#pesave');btn.disabled=true;var say=function(t){btn.innerHTML='<span class="spin"></span> '+t};say('Saving…');
+ var step=M.id?authed('/rest/v1/products?id=eq.'+M.id,{method:'PATCH',body:fields,prefer:'return=representation'}):authed('/rest/v1/products',{method:'POST',body:Object.assign({images:[]},fields),prefer:'return=representation'});
+ step.then(function(r){if(!r||!r.length)throw new Error('Not allowed. Is this account an admin?');var pid=r[0].id;M.id=pid;var pend=M.imgs.filter(function(x){return x.file}),done=0,failed=0,urls=[];
+  var chain=Promise.resolve();M.imgs.forEach(function(im){chain=chain.then(function(){if(im.url){urls.push(im.url);return}say('Uploading photo '+(done+failed+1)+' of '+pend.length+'…');
+    return uploadOne(pid,im.file).then(function(u){urls.push(u);done++;im.url=u;im.file=null},function(e){failed++;M.lastErr=e.message})})});
+  return chain.then(function(){var changed=JSON.stringify(urls)!==JSON.stringify(M.orig);if(!changed)return{pid:pid,urls:urls,done:done,failed:failed};say('Saving photos…');
+   return authed('/rest/v1/products?id=eq.'+pid,{method:'PATCH',body:{images:urls},prefer:'return=minimal'}).then(function(){return removeFiles(M.removed)}).then(function(){return{pid:pid,urls:urls,done:done,failed:failed}})})
+ }).then(function(res){M.saving=false;closeModal();return loadProducts().then(function(){renderProducts();toast(res.failed?'Saved, but '+res.failed+' photo(s) failed: '+M.lastErr:'Product saved'+(res.done?' with '+res.done+' new photo(s)':''),!!res.failed)})})
+ .catch(function(e){M.saving=false;btn.disabled=false;btn.textContent='Save product';err.textContent=e.code==='23505'||/duplicate|already exists/i.test(e.message)?'A product with that name already exists.':e.message})}
+function deleteProduct(id){var p=A.products.find(function(x){return x.id===id});if(!p)return;
+ confirmBox('Delete "'+p.name+'"?','This removes the product and its uploaded photos from the store for good. Orders already placed keep their own copy. If you only want it off the store for now, use the Visible switch instead.','Delete product',true).then(function(ok){if(!ok)return;
+  authed('/rest/v1/products?id=eq.'+id,{method:'DELETE',prefer:'return=representation'}).then(function(r){if(!r||!r.length)throw new Error('Not allowed. Is this account an admin?');return removeFiles(p.images||[])}).then(function(){A.products=A.products.filter(function(x){return x.id!==id});renderProducts();toast('Deleted '+p.name)}).catch(function(e){toast('Could not delete: '+e.message,true)})})}
+function deleteOrder(id){var o=A.orders.find(function(x){return x.id===id});if(!o)return;
+ confirmBox('Delete order '+ref(id)+'?','This permanently removes the order for '+o.customer_name+' ('+kes(o.total_kes)+'). Consider "Cancelled" instead if you want to keep a record.','Delete order',true).then(function(ok){if(!ok)return;
+  authed('/rest/v1/orders?id=eq.'+encodeURIComponent(id),{method:'DELETE',prefer:'return=representation'}).then(function(r){if(!r||!r.length)throw new Error('Not allowed.');A.orders=A.orders.filter(function(x){return x.id!==id});renderOrders();refreshBadge();toast('Order deleted')}).catch(function(e){toast('Could not delete: '+e.message,true)})})}
+
+/* ---------- CSV ---------- */
+function csv(name,rows){var t=rows.map(function(r){return r.map(function(c){c=String(c==null?'':c);if(/^[=+\-@]/.test(c))c="'"+c;return '"'+c.replace(/"/g,'""')+'"'}).join(',')}).join('\r\n'),b=new Blob(['\ufeff'+t],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},500)}
+function exportOrders(){var l=visOrders().filter(function(o){return A.of.status==='all'||o.status===A.of.status});csv('workwell-orders-'+new Date().toISOString().slice(0,10)+'.csv',[['Order','Date','Status','Customer','Phone','Delivery','M-Pesa code','Items','Total KES']].concat(l.map(function(o){return[ref(o.id),new Date(o.created_at).toLocaleString('en-KE'),LBL[o.status],o.customer_name,o.phone,o.delivery_location||'',o.mpesa_code||'',(o.order_items||[]).map(function(i){return i.quantity+' x '+i.product_name}).join('; '),o.total_kes]})))}
+function exportProducts(){csv('workwell-products-'+new Date().toISOString().slice(0,10)+'.csv',[['Name','Category','Price KES','In stock','Visible','Photos','Description']].concat(A.products.map(function(p){return[p.name,p.category,p.price_kes,p.in_stock?'yes':'no',p.is_active?'yes':'no',(p.images||[]).length,p.description||'']})))}
+function exportCustomers(){var m={};A.orders.forEach(function(o){if(o.status==='cancelled')return;var k=waNum(o.phone),c=m[k]||(m[k]={name:o.customer_name,phone:o.phone,n:0,spent:0});c.n++;if(o.status==='paid'||o.status==='delivered')c.spent+=o.total_kes});csv('workwell-customers.csv',[['Name','Phone','Orders','Paid KES']].concat(Object.keys(m).map(function(k){var c=m[k];return[c.name,c.phone,c.n,c.spent]})))}
+
+/* ---------- events ---------- */
+document.addEventListener('click',function(e){var b=e.target.closest('[data-act]');if(!b||b.tagName==='INPUT'||b.tagName==='SELECT')return;var a=b.dataset.act,id=b.dataset.id;
+ if(a==='tab'){A.tab=b.dataset.t;render();if(A.tab==='orders'&&A.loaded.o)loadOrders(true).then(function(){if(A.tab==='orders')renderOrders();refreshBadge()}).catch(function(){});else if(A.tab==='products'&&A.loaded.p)loadProducts().then(function(){if(A.tab==='products')renderProducts()}).catch(function(){})}
+ else if(a==='logout'){var t=A.S&&A.S.access_token;if(t)api('/auth/v1/logout',{method:'POST',token:t}).catch(function(){});signOutLocal();closeModal();render()}
+ else if(a==='forgot'){A.forgot=true;render()}else if(a==='unforgot'){A.forgot=false;render()}
+ else if(a==='retry')boot();else if(a==='ofilter'){A.of.status=b.dataset.s;renderOrders()}else if(a==='pfilter'){A.pf.f=b.dataset.f;renderProducts()}
+ else if(a==='toggle-order'){A.open[id]=!A.open[id];renderOrders()}
+ else if(a==='goto-order'){A.tab='orders';A.of={status:'all',q:'',range:'all'};A.open[id]=true;render();var el=$('#o-'+id);if(el)el.scrollIntoView({block:'center'})}
+ else if(a==='status')setStatus(id,b.dataset.s);else if(a==='del-order')deleteOrder(id);
+ else if(a==='refresh-orders'){b.disabled=true;loadOrders(true).then(function(n){render();if(!n)toast('Orders refreshed')}).catch(function(x){toast(x.message,true)}).then(function(){b.disabled=false})}
+ else if(a==='export-orders')exportOrders();else if(a==='export-products')exportProducts();else if(a==='export-customers')exportCustomers();
+ else if(a==='add-product')openEditor(null);else if(a==='edit-product')openEditor(+id);else if(a==='del-product')deleteProduct(+id);
+ else if(a==='stock'){var p=A.products.find(function(x){return x.id===+id});patchProduct(+id,{in_stock:!p.in_stock},!p.in_stock?'Back in stock':'Marked out of stock').then(renderProducts,function(){})}
+ else if(a==='visible'){var q=A.products.find(function(x){return x.id===+id});patchProduct(+id,{is_active:!q.is_active},!q.is_active?'Now visible on the store':'Hidden from the store').then(renderProducts,function(){})}
+ else if(a==='pe-close'){if(M&&M.saving)return;(M&&M.imgs||[]).forEach(function(i){if(i.preview)URL.revokeObjectURL(i.preview)});closeModal()}
+ else if(a==='pe-save')saveProduct();
+ else if(M&&/^img-/.test(a)){var i=+b.dataset.i,im=M.imgs;if(a==='img-del'){var x=im.splice(i,1)[0];if(x.url)M.removed.push(x.url);else if(x.preview)URL.revokeObjectURL(x.preview)}else if(a==='img-main'){im.unshift(im.splice(i,1)[0])}else if(a==='img-left'&&i>0){im.splice(i-1,0,im.splice(i,1)[0])}else if(a==='img-right'&&i<im.length-1){im.splice(i+1,0,im.splice(i,1)[0])}paintImgs()}});
+document.addEventListener('change',function(e){var t=e.target;if(t.dataset.act==='status-sel')setStatus(t.dataset.id,t.value);
+ else if(t.dataset.act==='price'){var id=+t.dataset.id,v=Math.round(+t.value);if(!(v>=1)){var p=A.products.find(function(x){return x.id===id});t.value=p.price_kes;return toast('Enter a price of at least KES 1',true)}patchProduct(id,{price_kes:v},'Price saved: '+kes(v)).catch(function(){})}
+ else if(t.id==='or'){A.of.range=t.value;renderOrders()}});
+document.addEventListener('input',function(e){if(e.target.id==='oq'){A.of.q=e.target.value;renderOrders()}else if(e.target.id==='pq'){A.pf.q=e.target.value;renderProducts()}});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&M&&!M.saving&&$('#pe')){(M.imgs||[]).forEach(function(i){if(i.preview)URL.revokeObjectURL(i.preview)});closeModal()}
+ if(e.key==='Enter'&&e.target.dataset&&e.target.dataset.act==='price')e.target.blur()});
+document.addEventListener('submit',function(e){var f=e.target;
+ if(f.id==='lf'){e.preventDefault();var em=$('#le').value.trim(),pw=$('#lp').value,er=$('#lerr'),b=$('#lg');er.textContent='';if(!em||!pw)return er.textContent='Enter your email and password.';b.disabled=true;
+  api('/auth/v1/token?grant_type=password',{method:'POST',body:{email:em,password:pw}}).then(function(j){setSession(j);boot()}).catch(function(x){b.disabled=false;er.textContent=x.net?x.message:(x.message==='Invalid login credentials'?'Wrong email or password.':x.message)})}
+ else if(f.id==='ff'){e.preventDefault();var fe=$('#fe').value.trim(),fr=$('#ferr');fr.className='err';if(!/^\S+@\S+\.\S+$/.test(fe))return fr.textContent='Enter a valid email address.';
+  api('/auth/v1/recover'+(/^https?:$/.test(location.protocol)?'?redirect_to='+encodeURIComponent(location.origin+location.pathname):''),{method:'POST',body:{email:fe}}).then(function(){fr.className='err okm';fr.textContent='If that email is an account, a reset link is on its way. Check your inbox.'}).catch(function(x){fr.textContent=x.message})}
+ else if(f.id==='pwf'){e.preventDefault();var a=$('#np').value,b2=$('#np2').value,pe=$('#pwe');pe.className='err';pe.textContent='';if(a.length<8)return pe.textContent='Use at least 8 characters.';if(a!==b2)return pe.textContent='The two passwords do not match.';
+  authed('/auth/v1/user',{method:'PUT',body:{password:a}}).then(function(){pe.className='err okm';pe.textContent='Password updated.';f.reset()}).catch(function(x){pe.textContent=x.message})}});
+
+/* recovery link (#access_token=...&type=recovery) */
+function hashFlow(){var h=location.hash.replace(/^#/,'');if(h.indexOf('error_description=')>-1){var m=h.match(/error_description=([^&]*)/);history.replaceState(null,'',location.pathname+location.search);try{toast(decodeURIComponent((m?m[1]:'').replace(/\+/g,' '))||'That link is invalid or has expired.',true)}catch(e){}return false}if(h.indexOf('access_token=')<0)return false;var p={};h.split('&').forEach(function(kv){var i=kv.indexOf('=');if(i>0){try{p[kv.slice(0,i)]=decodeURIComponent(kv.slice(i+1))}catch(e){}}});history.replaceState(null,'',location.pathname+location.search);
+ if(!p.access_token||!p.refresh_token)return false;
+ api('/auth/v1/user',{token:p.access_token}).then(function(u){A.S={access_token:p.access_token,refresh_token:p.refresh_token,expires_at:+p.expires_at||(Math.floor(Date.now()/1000)+(+p.expires_in||3600)),user:{id:u.id,email:u.email}};saveS();if(p.type==='recovery'){A.tab='settings';toast('Choose a new password below')}boot()}).catch(function(){toast('That link is invalid or has expired.',true);boot()});return true}
+
+/* keep orders fresh while the page is open */
+setInterval(function(){if(!A.S||!A.admin||document.hidden||!A.loaded.o)return;loadOrders(true).then(function(n){if(n&&A.tab==='orders')renderOrders();if(n&&A.tab==='overview')renderTab();refreshBadge()}).catch(function(){})},45000);
+
+loadS();if(!ON)render();else if(!hashFlow())boot();
+})();
+</script>
+</body>
+</html>
