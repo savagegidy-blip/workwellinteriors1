@@ -6,7 +6,7 @@ Online shop and admin dashboard for **Workwell Interiors**, a furniture and home
 - **Admin dashboard** (`admin.html`): orders, customers, products and photos, for the shop owner only.
 - **Backend**: [Supabase](https://supabase.com) (Postgres database, Auth, Storage). No server of your own is needed.
 
-Plain HTML, CSS and JavaScript. No build step, no framework, no external scripts. Each page is one self-contained file.
+Plain HTML, CSS and JavaScript. No build step or framework. The store loads Supabase's browser client to receive live product updates.
 
 ![Admin overview](docs/screenshots/admin-overview.png)
 
@@ -17,6 +17,7 @@ index.html                           The public store (one self-contained file)
 admin.html                           The admin dashboard (one self-contained file)
 supabase/01-workwell-supabase-setup.sql   Database: products, orders, client accounts, place_order()
 supabase/02-workwell-admin-setup.sql      Admin role, photo storage, tighter permissions
+supabase/03-workwell-realtime-setup.sql   Enable live product-change notifications
 docs/screenshots/                    Screenshots of the dashboard (sample data)
 ```
 
@@ -24,13 +25,13 @@ docs/screenshots/                    Screenshots of the dashboard (sample data)
 
 - Guests can order without an account. The order opens as a WhatsApp message to the shop **and** is saved in the database through a server-side function, `place_order()`, which looks prices up itself so a customer can never change what they pay.
 - If Supabase cannot be reached, the store still works as a WhatsApp-only shop using the product list built into `index.html`.
-- Prices, stock, photos, visibility and display order come from the `products` table when it is reachable, so changes in the dashboard show on the store on the next page load. The built-in list in `index.html` is only the fallback.
+- Prices, stock, photos, visibility and display order come from the `products` table when it is reachable. Dashboard changes stream to open store pages; a 15-second refresh also catches changes that row-level security does not stream. The built-in list in `index.html` is only the fallback.
 - Permissions are enforced by the database (row-level security), not by the web pages. The pages contain only the **public** anon key, which is safe to expose.
 
 ## Set up your own copy
 
 1. **Create a Supabase project** at supabase.com.
-2. In **SQL Editor**, run `supabase/01-workwell-supabase-setup.sql`, then `supabase/02-workwell-admin-setup.sql`. Check that the `products` table has 21 rows.
+2. In **SQL Editor**, run `supabase/01-workwell-supabase-setup.sql`, then `supabase/02-workwell-admin-setup.sql`, then `supabase/03-workwell-realtime-setup.sql`. Check that the `products` table has 21 rows.
 3. **Create your admin login:** Authentication > Users > Add user, enter your email and a strong password, and tick *Auto Confirm User*. Then run this in the SQL Editor, with your email:
    ```sql
    insert into public.admins (user_id)
@@ -48,7 +49,7 @@ docs/screenshots/                    Screenshots of the dashboard (sample data)
 
 ## Day to day
 
-- **Change a price, mark something out of stock, hide a product, add a product or photos:** Admin > Products. Nothing needs re-uploading.
+- **Change a price, mark something out of stock, hide a product, add a product or photos:** Admin > Products. Open store pages update automatically; no page refresh or re-upload is needed.
 - **New orders:** Admin > Orders. Confirm, mark paid or delivered, message the customer on WhatsApp, export to CSV.
 - **WhatsApp / M-Pesa number:** search for `0700357702`, `0700 357 702` and `254700357702` in `index.html`, and `0700357702` in `admin.html`.
 

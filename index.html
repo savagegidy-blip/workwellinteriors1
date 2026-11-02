@@ -236,6 +236,7 @@ var SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 /* ================================================================================ */
 
 var URL_=String(SUPABASE_URL).replace(/\/+$/,''),KEY=String(SUPABASE_ANON_KEY);
+window.WWliveConfig={url:URL_,key:KEY};
 var ON=/^https?:\/\//.test(URL_)&&URL_.indexOf('YOUR-')<0&&KEY.indexOf('YOUR-')<0&&KEY.length>20;
 /* Safety guard: refuse to run if someone pasted a secret / service_role key. */
 if(ON){if(/^sb_secret_/.test(KEY))ON=false;
@@ -403,13 +404,14 @@ function applyRow(c,r,key){
  var o=c.querySelector('a.order');if(o&&pe)o.href=o.href.split('?')[0]+'?text='+encodeURIComponent('Hello Workwell Interiors, I would like to order: '+r.name+' ('+pe.textContent+')');
  var imgs=(r.images||[]).filter(okImg);c.dataset.imgs=JSON.stringify(imgs);
  if(im){if(!(key in OWN))OWN[key]=im.getAttribute('src');
-  if(imgs.length){if(im.getAttribute('src')!==imgs[0]){im.onerror=function(){im.onerror=null;im.src=OWN[key]||PH};im.src=imgs[0];im.classList.remove('pad');im.alt=r.name}}}
+  if(imgs.length){if(im.getAttribute('src')!==imgs[0]){im.onerror=function(){im.onerror=null;im.src=OWN[key]||PH};im.src=imgs[0];im.classList.remove('pad');im.alt=r.name}}
+  else if(im.getAttribute('src')!==OWN[key]){im.onerror=null;im.src=OWN[key]||PH;im.alt=r.name}}
  var ab=c.querySelector('.add'),bd=c.querySelector('.oosb');
  if(r.in_stock===false){c.dataset.oos='1';c.classList.add('oos');if(!bd){bd=document.createElement('span');bd.className='oosb';bd.textContent='Out of stock';c.appendChild(bd)}if(ab){ab.disabled=true;ab.textContent='Out of stock'}}
  else{delete c.dataset.oos;c.classList.remove('oos');if(bd)bd.remove();if(ab){ab.disabled=false;ab.textContent='Add to order'}}}
 function syncCatalog(){
  api('/rest/v1/products?select=id,name,legacy_name,category,description,price_kes,in_stock,images,sort_order&order=sort_order.asc,id.asc',{timeout:8000}).then(function(rows){
-  var S2=window.WWshop;if(!rows||!rows.length||!S2||!window.WWh||!window.WW||!window.WW.addInit)return;
+  var S2=window.WWshop;if(!rows||!S2||!window.WWh||!window.WW||!window.WW.addInit)return;
   var byKey={},byCard={};rows.forEach(function(r){byKey[r.legacy_name||r.name]=r});
   S2.cards.slice().forEach(function(c){var key=c.dataset.key||(c.dataset.key=c.querySelector('h3').textContent),r=byKey[key];
    if(!r){c.dataset.hid='1';c.dataset.i=9999;return}byCard[key]=c;applyRow(c,r,key)});
@@ -420,6 +422,7 @@ function syncCatalog(){
   S2.chips();S2.sort();S2.apply();
   var gone=window.WW.resync();if(gone>0)toast('Some items in your order are no longer available and were removed.');
  }).catch(function(e){if(window.console&&e&&!e.net)console.warn('Workwell catalogue sync:',e)})}
+window.WWsyncCatalog=syncCatalog;
 
 /* ---------- start ---------- */
 function init(){
@@ -438,6 +441,20 @@ function init(){
  var svEl=$('sv');if(svEl&&window.MutationObserver)new MutationObserver(function(){if(svEl.textContent)try{svEl.scrollIntoView({block:'nearest'})}catch(e){}}).observe(svEl,{childList:true,characterData:true,subtree:true});
  if(S)loadProfile()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* Keep already-open storefronts in sync with dashboard edits. The periodic refresh
+   also catches visibility changes that public row-level security may not stream. */
+(function(){
+ if(window.supabase&&window.WWliveConfig&&window.WWsyncCatalog)try{
+  var client=window.supabase.createClient(window.WWliveConfig.url,window.WWliveConfig.key);
+  client.channel('workwell-products-live')
+   .on('postgres_changes',{event:'*',schema:'public',table:'products'},function(){window.WWsyncCatalog()})
+   .subscribe();
+ }catch(e){if(window.console)console.warn('Workwell live updates:',e)}
+ if(window.WWsyncCatalog)window.setInterval(function(){if(!document.hidden)window.WWsyncCatalog()},15000);
 })();
 </script>
 </body></html>
