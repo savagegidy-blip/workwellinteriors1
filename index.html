@@ -236,12 +236,12 @@ var SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 /* ================================================================================ */
 
 var URL_=String(SUPABASE_URL).replace(/\/+$/,''),KEY=String(SUPABASE_ANON_KEY);
-window.WWliveConfig={url:URL_,key:KEY};
 var ON=/^https?:\/\//.test(URL_)&&URL_.indexOf('YOUR-')<0&&KEY.indexOf('YOUR-')<0&&KEY.length>20;
 /* Safety guard: refuse to run if someone pasted a secret / service_role key. */
 if(ON){if(/^sb_secret_/.test(KEY))ON=false;
  try{var pl=KEY.split('.')[1];if(pl){var role=JSON.parse(atob(pl.replace(/-/g,'+').replace(/_/g,'/'))).role;if(role==='service_role')ON=false}}catch(e){}
  if(!ON&&window.console)console.error('Workwell: the key in SUPABASE_ANON_KEY is a secret key or invalid. Use the public anon key only. Account features are switched off.')}
+window.WWliveConfig={url:URL_,key:KEY,enabled:ON};
 
 function $(i){return document.getElementById(i)}
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
@@ -448,13 +448,13 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 /* Keep already-open storefronts in sync with dashboard edits. The periodic refresh
    also catches visibility changes that public row-level security may not stream. */
 (function(){
- if(ON&&window.supabase&&window.WWliveConfig&&window.WWsyncCatalog)try{
+ if(window.WWliveConfig&&window.WWliveConfig.enabled&&window.supabase&&window.WWsyncCatalog)try{
   var client=window.supabase.createClient(window.WWliveConfig.url,window.WWliveConfig.key);
   client.channel('workwell-products-live')
    .on('postgres_changes',{event:'*',schema:'public',table:'products'},function(){window.WWsyncCatalog()})
    .subscribe();
  }catch(e){if(window.console)console.warn('Workwell live updates:',e)}
- if(ON&&window.WWsyncCatalog)window.setInterval(function(){if(!document.hidden)window.WWsyncCatalog()},15000);
+ if(window.WWliveConfig&&window.WWliveConfig.enabled&&window.WWsyncCatalog)window.setInterval(function(){if(!document.hidden)window.WWsyncCatalog()},15000);
 })();
 </script>
 </body></html>
