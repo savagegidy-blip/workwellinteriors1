@@ -448,13 +448,13 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 /* Keep already-open storefronts in sync with dashboard edits. The periodic refresh
    also catches visibility changes that public row-level security may not stream. */
 (function(){
- if(window.supabase&&window.WWliveConfig&&window.WWsyncCatalog)try{
+ if(ON&&window.supabase&&window.WWliveConfig&&window.WWsyncCatalog)try{
   var client=window.supabase.createClient(window.WWliveConfig.url,window.WWliveConfig.key);
   client.channel('workwell-products-live')
    .on('postgres_changes',{event:'*',schema:'public',table:'products'},function(){window.WWsyncCatalog()})
    .subscribe();
  }catch(e){if(window.console)console.warn('Workwell live updates:',e)}
- if(window.WWsyncCatalog)window.setInterval(function(){if(!document.hidden)window.WWsyncCatalog()},15000);
+ if(ON&&window.WWsyncCatalog)window.setInterval(function(){if(!document.hidden)window.WWsyncCatalog()},15000);
 })();
 </script>
 </body></html>
